@@ -404,5 +404,5 @@ FodyWeavers.xsd
 *.bat
 
  
-src/appsettings.json
-src/appsettings.json
+/src/appsettings.json
+/src/appsettings.Development.json
