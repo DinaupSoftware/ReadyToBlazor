@@ -1,0 +1,43 @@
+﻿@inject CurrentUserService CurrentUserService
+
+
+@if (CurrentUserService.isInitialized == false)
+{
+    
+    <span>cargando</span>
+
+}else if (CurrentUserService?.User?.IsLogued ?? false)
+{
+    @Authorized
+}
+else
+{
+    @NotAuthorized
+}
+
+
+
+@code {
+
+
+
+    [Parameter] public RenderFragment? Authorized { get; set; }
+    [Parameter] public RenderFragment? NotAuthorized { get; set; }
+
+
+    protected override async  Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await CurrentUserService.InitializeAsync();
+        CurrentUserService.OnChange += StateHasChanged;
+
+    }
+
+
+    public void Dispose()
+    {
+        CurrentUserService.OnChange -= StateHasChanged;
+    }
+
+
+}

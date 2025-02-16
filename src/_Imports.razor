@@ -1,0 +1,19 @@
+﻿@using System.Net.Http
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using ReadyToBlazor
+@using ReadyToBlazor.Components
+@using Radzen
+@using Radzen.Blazor
+@inject Dinaup.DinaupClientC DinaupClient
+@inject NavigationManager Navigation
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@inject CurrentUserService CurrentUserService
+@inject NotificationService NotificationService
+@inject SMTPService  SMTPService

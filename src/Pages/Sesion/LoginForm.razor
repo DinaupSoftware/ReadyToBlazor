@@ -1,0 +1,218 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using Radzen.Blazor
+
+<LoginView>
+	<Authorized>
+		<p>Bienvenido, @CurrentUserService.User.Nombre</p>
+		<RadzenButton Click=@Logout></RadzenButton>
+	</Authorized>
+	<NotAuthorized>
+		<RadzenCard Style="max-width: 100%; width:500px;">
+
+
+			@if (t == "1")
+			{
+
+				<div class="container">
+					<RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success">
+						La cuenta se ha activado correctamente, ya puedes iniciar sesión.
+					</RadzenAlert>
+				</div>
+
+
+			}
+			else if (t == "3")
+			{
+
+				<div class="container">
+					<RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success">
+						La contraseña se ha actualizado, ya puedes iniciar sesión.
+					</RadzenAlert>
+				</div>
+
+
+			}
+
+
+			@if (p == "recovery")
+			{
+
+				<EditForm Model="@changePasswordWithRecoveryCodeModel" OnValidSubmit="ChangePasswordWithCodeSubmit">
+
+					<div class="alert alert-info">
+						<p>¡Estupendo! Por favor, introduce tu nueva contraseña y repítela en el siguiente campo para confirmar.</p>
+					</div>
+
+					<DataAnnotationsValidator />
+					<ValidationSummary />
+
+					<div class="form-group">
+						<label for="passwordCreate">Contraseña:</label>
+						<InputText id="passwordCreate" type="password" class="form-control" @bind-Value="changePasswordWithRecoveryCodeModel.Password" autocomplete="new-password" />
+					</div>
+					<div class="form-group">
+						<label for="confirmPasswordCreate">Repetir Contraseña:</label>
+						<InputText id="confirmPasswordCreate" type="password" class="form-control" @bind-Value="changePasswordWithRecoveryCodeModel.ConfirmPassword" autocomplete="new-password" />
+					</div>
+					<div style="min-height:10px"></div>
+					<div class="mt-2"></div>
+
+					<div class="form-group">
+						<label for="token">Email:</label>
+						<InputText readonly id="email" class="form-control" @bind-Value=@changePasswordWithRecoveryCodeModel.Email />
+					</div>
+					<div class="form-group">
+						<label for="token">Código:</label>
+						<InputText readonly id="token" class="form-control" @bind-Value=@changePasswordWithRecoveryCodeModel.Code />
+					</div>
+					<div style="min-height:20px"></div>
+
+					<RadzenButton ButtonType="ButtonType.Submit" Text="Cambiar contraseña" />
+
+				</EditForm>
+
+			}
+			else
+			{
+
+				<RadzenTabs>
+					<Tabs>
+
+						<!-- Pestaña de Iniciar Sesión -->
+						<RadzenTabsItem Text="Iniciar sesión">
+							<EditForm Model="@loginModel" OnValidSubmit="LoginSubmit">
+								<DataAnnotationsValidator />
+								<ValidationSummary />
+
+								@if (ischangePasswordWithRecoveryCodeModel)
+								{
+									<RadzenAlert AlertStyle="AlertStyle.Success" AllowClose=false>
+										<b>¡Contraseña Actualizada</b>
+										<p>Ya puedes iniciar sesión</p>
+									</RadzenAlert>
+								}
+
+								<div class="form-group">
+									<label for="emailLogin">Email:</label>
+									<InputText id="emailLogin" class="form-control" @bind-Value="loginModel.Email" autocomplete="email" />
+								</div>
+								<div class="form-group">
+									<label for="passwordLogin">Contraseña:</label>
+									<InputText id="passwordLogin" type="password" class="form-control" @bind-Value="loginModel.Password" autocomplete="current-password" />
+								</div>
+								<div class="form-group">
+									<InputCheckbox id="rememberme" class="form-check-input" @bind-Value="loginModel.RememberMe" />
+									<label for="rememberme">Mantener sesión iniciada</label>
+								</div>
+								<div class="mt-2"></div>
+								<RadzenButton ButtonType="ButtonType.Submit" Text="Iniciar Sesión" />
+							</EditForm>
+						</RadzenTabsItem>
+
+						<!-- Pestaña de Crear Cuenta -->
+						<RadzenTabsItem Text="Crear Cuenta">
+
+
+
+
+							@if (isActivationEmailSent)
+							{
+								<RadzenAlert AlertStyle="AlertStyle.Success" AllowClose=false>
+									Se ha enviado un email. Por favor, pulse sobre el enlace para activar su cuenta.
+								</RadzenAlert>
+
+
+							}
+							else
+							{
+
+								<EditForm Model="@createAccountModel" OnValidSubmit="CreateAccountSubmit">
+									<DataAnnotationsValidator />
+									<ValidationSummary />
+
+									<div class="form-group">
+										<label for="nameCreate">Nombre:</label>
+										<InputText id="nameCreate" class="form-control" @bind-Value="createAccountModel.Name" autocomplete="name" />
+									</div>
+									<div class="form-group">
+										<label for="emailCreate">Email:</label>
+										<InputText id="emailCreate" class="form-control" @bind-Value="createAccountModel.Email" autocomplete="email" />
+									</div>
+									<div class="form-group">
+										<label for="passwordCreate">Contraseña:</label>
+										<InputText id="passwordCreate" type="password" class="form-control" @bind-Value="createAccountModel.Password" autocomplete="new-password" />
+									</div>
+									<div class="form-group">
+										<label for="confirmPasswordCreate">Repetir Contraseña:</label>
+										<InputText id="confirmPasswordCreate" type="password" class="form-control" @bind-Value="createAccountModel.ConfirmPassword" autocomplete="new-password" />
+									</div>
+									<div class="mt-2"></div>
+									<RadzenButton ButtonType="ButtonType.Submit" Text="Crear cuenta" />
+								</EditForm>
+
+							}
+
+						</RadzenTabsItem>
+
+						<!-- Pestaña de Recuperar Contraseña -->
+						<RadzenTabsItem Text="Recuperar Contraseña">
+
+							@if (isRecoveryEmailSent)
+							{
+								<RadzenAlert AlertStyle="AlertStyle.Success" AllowClose=false>
+									Se ha enviado un email. Por favor, pulse sobre el enlace para recuperar su cuenta.
+								</RadzenAlert>
+
+							}
+							else
+							{
+
+
+								<EditForm Model="@recoverPasswordModel" OnValidSubmit="RecoverPasswordSubmit">
+									<DataAnnotationsValidator />
+									<ValidationSummary />
+
+									<div class="form-group">
+										<label for="emailRecover">Email:</label>
+										<InputText id="emailRecover" class="form-control" @bind-Value="recoverPasswordModel.Email" autocomplete="email" />
+									</div>
+									<div class="mt-2"></div>
+									<RadzenButton ButtonType="ButtonType.Submit" Text="Recuperar Contraseña" />
+								</EditForm>
+							}
+						</RadzenTabsItem>
+
+					</Tabs>
+				</RadzenTabs>
+
+
+			}
+
+		</RadzenCard>
+	</NotAuthorized>
+</LoginView>
+
+
+@code {
+
+
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "t")]
+	public string t { get; set; }
+
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "p")]
+	public string p { get; set; }
+
+
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "token")]
+	public string token { get; set; }
+
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "login")]
+	public string login { get; set; }
+
+
+}
