@@ -8,6 +8,19 @@ public class SMTPService
 {
     public SMTPClient SMTPClient;
 
+
+    
+	public bool IsAvailable
+	{
+		get
+		{
+			return SMTPClient.IsAvailable ;
+		}
+	}
+
+
+
+
     public SMTPService(SMTPClient sMTPClient)
     {
         SMTPClient = sMTPClient;

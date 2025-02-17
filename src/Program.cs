@@ -9,7 +9,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRadzenComponents();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthorization();
 builder.Services.AddScoped<CurrentUserService>();
 
 
@@ -25,11 +24,10 @@ var configDinaup = builder.Configuration.GetSection("Dinaup").Get<DinaupSettings
 var configSMTP = builder.Configuration.GetSection("Smtp").Get<SmtpSettings>();
 
 var dinaupClient = new Dinaup.DinaupClientC(configDinaup.APIBaseUrl, configDinaup.APIKey, configDinaup.APISecret, "*");
-dinaupClient.InitializeAsync(5000);
+
+Task.Run(async ()=>{  await  dinaupClient.InitializeAsync(5000);});
 
 builder.Services.AddSingleton(dinaupClient);
-
-
 builder.Services.AddSingleton<SMTPClient>( new SMTPClient(configSMTP));
 builder.Services.AddSingleton<SMTPService>(  );
 
@@ -42,6 +40,7 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
+app.UseMiddleware<MaintenanceMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

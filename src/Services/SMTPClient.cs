@@ -10,24 +10,24 @@ public class SMTPClient
 		this.configSMTP = configSMTP;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
+	public bool IsAvailable
+	{
+		get
+		{
+			return !string.IsNullOrEmpty(configSMTP.Host) && configSMTP.Port > 0 && !string.IsNullOrEmpty(configSMTP.UserName) && !string.IsNullOrEmpty(configSMTP.Password) && !string.IsNullOrEmpty(configSMTP.SenderEmail);
+		}
+	}
 
 
 
 
 	public async Task SendEmailAsync(string to, string subject, string body)
 	{
+		if (!IsAvailable)
+		{
+			throw new InvalidOperationException("SMTP settings are not properly configured.");
+		}
+
 		var smtpClient = new SmtpClient(configSMTP.Host)
 		{
 			Port = configSMTP.Port,

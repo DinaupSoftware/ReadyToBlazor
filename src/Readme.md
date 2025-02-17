@@ -16,7 +16,8 @@ Se ha realizado una implementación mínima que sirva de punto de partida para hac
 1. Si no deseas dar la posibilidad a los usuarios de registrarse o recuperar contraseñas, puedes modificar  `LoginForm.razor`
 1. En esta página únicamente pueden registrarse entidades, los empleados deben darse de alta asociados a la licencia.
 1. Puedes enfrentar problemas de ratelimit y concurrencia utilizando la API de dinaup. Puedes ahorrar costes utilizando Pg Sync.
-
+1. hay un controlador HealthCheck para comprobar el estado
+1. 
 ## Requisitos
 1. Pon tu clave API en appsettings
 1. Debes configurar un email smtp en Dinaup.

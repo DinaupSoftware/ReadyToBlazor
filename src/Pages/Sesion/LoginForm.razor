@@ -2,6 +2,8 @@
 @using System.ComponentModel.DataAnnotations
 @using Radzen.Blazor
 
+
+
 <LoginView>
 	<Authorized>
 		<p>Bienvenido, @CurrentUserService.User.Nombre</p>
@@ -35,7 +37,45 @@
 			}
 
 
-			@if (p == "recovery")
+
+
+			@if (SMTPService.IsAvailable == false)
+			{
+
+
+				<RadzenTabsItem Text="Iniciar sesión">
+					<EditForm Model="@loginModel" OnValidSubmit="LoginSubmit">
+						<DataAnnotationsValidator />
+						<ValidationSummary />
+
+						@if (ischangePasswordWithRecoveryCodeModel)
+						{
+							<RadzenAlert AlertStyle="AlertStyle.Success" AllowClose=false>
+								<b>¡Contraseña Actualizada</b>
+								<p>Ya puedes iniciar sesión</p>
+							</RadzenAlert>
+						}
+
+						<div class="form-group">
+							<label for="emailLogin">Email:</label>
+							<InputText id="emailLogin" class="form-control" @bind-Value="loginModel.Email" autocomplete="email" />
+						</div>
+						<div class="form-group">
+							<label for="passwordLogin">Contraseña:</label>
+							<InputText id="passwordLogin" type="password" class="form-control" @bind-Value="loginModel.Password" autocomplete="current-password" />
+						</div>
+						<div class="form-group">
+							<InputCheckbox id="rememberme" class="form-check-input" @bind-Value="loginModel.RememberMe" />
+							<label for="rememberme">Mantener sesión iniciada</label>
+						</div>
+						<div class="mt-2"></div>
+						<RadzenButton ButtonType="ButtonType.Submit" Text="Iniciar Sesión" />
+					</EditForm>
+				</RadzenTabsItem>
+
+
+			}
+			else if (p == "recovery")
 			{
 
 				<EditForm Model="@changePasswordWithRecoveryCodeModel" OnValidSubmit="ChangePasswordWithCodeSubmit">
