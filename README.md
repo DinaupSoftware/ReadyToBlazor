@@ -8,6 +8,8 @@
 2. Instalar Net 9
  Instala NET 9 (Hosting Bundle para .NET 9:) https://dotnet.microsoft.com/en-us/download/dotnet/9.0
 
+3. Opcional WebDeploy
+    https://www.microsoft.com/en-us/download/details.aspx?id=106070
 
 
 ### Configuración del archivo appsettings.json
