@@ -6,7 +6,7 @@ using Microsoft.JSInterop;
 
 
 
-namespace DinaZen.Services
+namespace ReadyToBlazor.Services
 {
 	public class CurrentUserService
 	{

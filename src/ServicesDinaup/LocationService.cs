@@ -1,5 +1,5 @@
-﻿using static DinaZen.Extensions;
-using Dinaup;
+﻿using Dinaup;
+using DinaZen;
 using Microsoft.Extensions.Caching.Memory;
 using static DemoUp.MyDinaup.Reports.FuncionalidadD;
 using static DemoUp.MyDinaup.SectionsD;
