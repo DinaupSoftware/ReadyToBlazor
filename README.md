@@ -1,18 +1,16 @@
-### Instalar windows server
+ 
+![Ready To Blazor](https://github.com/user-attachments/assets/19f6f5a2-4577-4f7e-b357-45cd9b91b8e0)
+
+# Ready To Blazor
+
+Bienvenido a Ready To Blazor, un starter-kit basado en Blazor Server que acelera la creación de aplicaciones empresariales conectadas a Dinaup. En este artículo encontrarás una introducción gradual—desde la pila de componentes hasta ejemplos de código listos para copiar—para que puedas publicar tu primera pantalla en minutos.
 
 
-1. Instalar IIS 
- ```
- Install-WindowsFeature -name Web-Server,Web-Http-Redirect,Web-Request-Monitor,Web-Http-Tracing,Web-Filtering,Web-Stat-Compression,Web-Dyn-Compression,Web-WebSockets -IncludeManagementTools
- ```
-2. Instalar Net 9
- Instala NET 9 (Hosting Bundle para .NET 9:) https://dotnet.microsoft.com/en-us/download/dotnet/9.0
+- [Aprende a Instalar IIS](http://doc.dinaup.com/instalar-iis-en-windows-server-2025)
+- [Introducción Ready To Blazor](https://doc.dinaup.com/desarrollo/open-soruce/ready-to-blazor)
+ 
 
-3. Opcional WebDeploy
-    [https://www.microsoft.com/en-us/download/details.aspx?id=106070](https://www.iis.net/downloads/microsoft/web-deploy)
-
-
-### Configuración del archivo appsettings.json
+## 1. Configuración del archivo appsettings.json
 Debes crear  `appsettings.json`  
 ```json
 {
