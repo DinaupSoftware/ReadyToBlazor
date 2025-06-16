@@ -7,13 +7,24 @@
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
 @using ReadyToBlazor
+@using ReadyToBlazor.ServicesDinaup
 @using ReadyToBlazor.Components
 @using Radzen
 @using Radzen.Blazor
+@using static DinaZen.Extensions
 @inject Dinaup.DinaupClientC DinaupClient
 @inject NavigationManager Navigation
 @using System.Security.Claims
 @inject IHttpContextAccessor HttpContextAccessor
 @inject CurrentUserService CurrentUserService
+@inject DialogService DialogService
 @inject NotificationService NotificationService
+@inject LocationService LocationService
 @inject SMTPService  SMTPService
+@using ReadyToBlazor.Shared
+@using static DemoUp.MyDinaup.Reports.FuncionalidadD
+
+
+@using static Dinaup.extensions
+@using DinaZen
+@using   DinaZen.Components

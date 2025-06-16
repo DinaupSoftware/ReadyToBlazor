@@ -1,0 +1,39 @@
+﻿@page "/Ej1"
+@if (Paises.IsNull())
+{
+	<LoaderU />
+}
+else
+{
+
+	<RadzenDataGrid PageSize="10" AllowPaging="true" Count=@Paises.Count() Data=@Paises>
+		<Columns>
+			<RadzenDataGridColumn Property=@(nameof(APIPaisesC.APIPaises_RowC.TextoPrincipal)) Title="Nombre Pais" Width="200px" />
+			<RadzenDataGridColumn Property=@(nameof(APIPaisesC.APIPaises_RowC.CodAlfabetico2)) Title="Código Pais" Width="100px" />
+		</Columns>
+	</RadzenDataGrid>
+
+
+}
+
+
+@code {
+
+
+
+
+	private IEnumerable<APIPaisesC.APIPaises_RowC> Paises;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		var rpt = new APIPaisesC();
+		await rpt.ExecuteQueryAsync(DinaupClient, 1, 1000);
+		Paises = rpt.Rows;
+
+	}
+
+
+
+}

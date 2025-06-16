@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Radzen;
+using ReadyToBlazor.ServicesDinaup;
 using System.Reflection;
 
 try
@@ -7,14 +8,35 @@ try
 
 	var builder = WebApplication.CreateBuilder(args);
 
+	// Obtiene el entorno y la ruta raíz de la aplicación
+	var env = builder.Environment;
+	var contentRoot = env.ContentRootPath;
+
+	var localConfig = Path.Combine(contentRoot, "appsettings.json");
+	var externalConfig = @"C:\IIS\appsettings.readytoblazor.json";
+
+	// Limpia las fuentes de configuración por defecto (opcional)
+	builder.Configuration.Sources.Clear();
+
+	// Si existe appsettings.json en el sitio, lo carga; si no, carga el externo
+	if (File.Exists(localConfig))
+		builder.Configuration.AddJsonFile(localConfig, optional: false, reloadOnChange: true);
+	else if (File.Exists(externalConfig))
+		builder.Configuration.AddJsonFile(externalConfig, optional: false, reloadOnChange: true);
+	else
+		throw new FileNotFoundException("No se encontró ningún fichero de configuración. " + $"Buscados: '{localConfig}' y '{externalConfig}'");
+
+	// (Opcional) Añade otras fuentes: entorno, variables, etc.
+	builder.Configuration.AddEnvironmentVariables().AddCommandLine(args);
+
+
+
 	builder.Services.AddControllers();
 	builder.Services.AddRazorPages();
 	builder.Services.AddServerSideBlazor();
 	builder.Services.AddRadzenComponents();
 	builder.Services.AddHttpContextAccessor();
 	builder.Services.AddScoped<CurrentUserService>();
-
-
 
 
 	// Dinaup -> Logs
@@ -32,6 +54,7 @@ try
 	builder.Services.AddSingleton(dinaupClient);
 	builder.Services.AddSingleton<SMTPClient>(new SMTPClient(configSMTP));
 	builder.Services.AddSingleton<SMTPService>();
+	builder.Services.AddScoped<LocationService>();
 
 
 	var app = builder.Build();
@@ -42,7 +65,7 @@ try
 		app.UseHsts();
 	}
 
-	app.UseMiddleware<MaintenanceMiddleware>();
+	app.UseMiddleware< MaintenanceMiddleware>();
 	app.UseHttpsRedirection();
 	app.UseStaticFiles();
 	app.UseRouting();

@@ -1,0 +1,27 @@
+﻿@using ReadyToBlazor.Data
+
+
+<RadzenCard Variant="Variant.Outlined" class="m.2">
+	<RadzenFormField Text="Título">
+		<Start>
+			<RadzenIcon Icon="sell" />
+		</Start>
+		<ChildContent>
+			<RadzenTextBox Name=@(token.STR() + "titulo") @bind-Value=@Data.Titulo />
+		</ChildContent>
+		<Helper>
+			<RadzenDataAnnotationValidator Component=@(token.STR() + "titulo") />
+		</Helper>
+	</RadzenFormField>
+</RadzenCard>
+
+
+@code {
+
+	[Parameter]
+	public SeccionDePruebaItemModel Data { get; set; }
+
+	Guid token = Guid.NewGuid();
+
+
+}

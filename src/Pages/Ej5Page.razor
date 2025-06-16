@@ -1,0 +1,97 @@
+﻿@page "/Ej5"
+@using Dinaup
+@using static DemoUp.MyDinaup.SectionsD
+@using static DemoUp.MyDinaup.SectionsD.SeccionDePruebasAPID
+@using static DemoUp.MyDinaup.Reports.FuncionalidadD.APISeccionDePruebasAPIC
+
+<RadzenCard>
+	<CardTitleU Title="Agregar" Icon="add" />
+
+	<RadzenFormField Text="Nombre" Variant="Variant.Flat">
+		<RadzenTextBox @bind-Value=@editingText Style="width: 100%;" />
+	</RadzenFormField>
+	<RadzenButton Icon="add" Text="Guardar" Click=@AddTestData IsBusy=@addTestDataIsBusy ></RadzenButton>
+</RadzenCard>
+<div style="min-height:10px"></div>
+<RadzenCard>
+	<CardTitleU Title="Pruebas" Icon="labs" />
+
+	<div class="p-2 d-flex gap-2">
+		<RadzenTextBox Placeholder="🔍 Buscar..." @bind-Value=QuerySearch @bind-Value:after=@UpdateSearch />
+	</div>
+
+	<RadzenDataGrid Data=@ReportData?.Rows Count=@(ReportData?.TotalResults ?? 0) PageSize=@PageSize AllowSorting=true AllowPaging="true" AllowFiltering="true" IsLoading=@ReportData.IsNull() LoadData="@LoadData">
+		<Columns>
+			<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.TextoPrincipal))" Title="Nombre" Width="200px" />
+			<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.FechaIA))" Title="Fecha" Width="100px" />
+			<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.Valorentero))" Title="Valorentero" Width="100px" />
+			<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.Textodeprueba))" Title="Textodeprueba" Width="100px" />
+		</Columns>
+	</RadzenDataGrid>
+</RadzenCard>
+
+@code {
+	private string QuerySearch { get; set; }
+	private int PageSize = 10;
+	private DemoUp.MyDinaup.Reports.FuncionalidadD.APISeccionDePruebasAPIC ReportData = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		ReportData.RequestParams.ResultsPerPage = PageSize;
+		ReportData.RequestParams.CurrentPage = 1;
+		await LoadData(null);
+	}
+
+	private async Task LoadData(LoadDataArgs args)
+	{
+		await Extensions.LoadReportDataAsync(DinaupClient, CurrentUserService.User, ReportData, args);
+	}
+
+	private async Task UpdateSearch()
+	{
+		ReportData.RequestParams.QuerySearch = QuerySearch;
+		ReportData.RequestParams.CurrentPage = 1;
+		await ReportData.ExecuteUpdateDataAsync();
+	}
+
+	private async Task Refresh()
+	{
+		await ReportData.ExecuteUpdateDataAsync();
+	}
+
+}
+
+@code {
+
+	string editingText;
+
+	private bool addTestDataIsBusy { get; set; }
+
+	private async Task AddTestData()
+	{
+		addTestDataIsBusy = true;
+
+		try
+		{
+			var wOp = new WriteOperation(Guid.Empty);
+			wOp.DataMainRow.Add(SeccionDePruebasAPIES.TextoPrincipal, editingText);
+			var result = await DinaupClient.RunWriteOperationAsync(CurrentUserService.User, SeccionDePruebasAPID._SectionIDGUID, wOp, false);
+			result.EnsureSuccess();
+			editingText = "";
+			await Refresh();
+
+		}
+		catch (Exception ex)
+		{
+			NotificationService.Notify(NotificationSeverity.Error, "Ups.", ex.Message);
+		}
+
+		addTestDataIsBusy = false;
+
+
+	}
+
+
+
+}

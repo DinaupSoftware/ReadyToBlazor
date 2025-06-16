@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -7,12 +7,36 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dinaup" Version="9.1.0.18" />
-    <PackageReference Include="Radzen.Blazor" Version="6.0.6" />
+    <Compile Include="Services\CurrentUserService.cs.exclude" />
+    <Compile Include="Shared\ErrorPage.cshtml.cs.exclude" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Dinaup\src\Dinaup.vbproj" />
+    <Content Include="Shared\ErrorPage.cshtml.exclude" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DemoUp.MyDinaup" Version="9.1.2.2" />
+    <PackageReference Include="Dinaup" Version="9.1.2.1" />
+    <PackageReference Include="Radzen.Blazor" Version="7.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="logs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Middleware\MaintenanceMiddleware.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GitHub\DinaZen\DinaZen\DinaZen\DinaZen.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Dinaup.extensions">
+      <Static>True</Static>
+    </Using>
   </ItemGroup>
 
 </Project>

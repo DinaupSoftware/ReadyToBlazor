@@ -1,0 +1,190 @@
+﻿@using Dinaup
+@using static DemoUp.MyDinaup.SectionsD.SeccionDePruebasAPID
+@using static DemoUp.MyDinaup.SectionsD
+<DialogLayout>
+
+	<TitleContent>
+		Sección de Prueba
+	</TitleContent>
+	<BodyContent>
+
+		<div class="d-flex flex-column gap-3">
+
+			<RadzenFormField Text="Título">
+				<RadzenTextBox @bind-Value="@editingTextoPrincipal" />
+			</RadzenFormField>
+
+			<RadzenFormField Text="Valor decimal">
+				<RadzenNumeric @bind-Value="@editingDecimal" />
+			</RadzenFormField>
+
+
+			<RadzenFormField Text="Hora">
+				<RadzenDatePicker @bind-Value="@editingTimeOnly" />
+			</RadzenFormField>
+
+			<RadzenFormField Text="Fecha">
+				<RadzenDatePicker @bind-Value="@editingDateOnly" />
+			</RadzenFormField>
+
+			<RadzenFormField Text="Fecha y Hora">
+				<RadzenDatePicker @bind-Value="@editingDateTime" ShowTime="@true" />
+			</RadzenFormField>
+
+		</div>
+
+
+	</BodyContent>
+	<FooterContent>
+		<div class="d-flex gap-2 justify-content-end">
+			<RadzenButton Icon="check" Text="Guardar" Variant=@(HasChanged() ? Variant.Text : Variant.Filled) ButtonStyle="ButtonStyle.Success" Click=@AcceptAsync IsBusy=@acceptIsBussy />
+			<RadzenButton Icon="close" Text="Cerrar" Variant="Variant.Text" ButtonStyle="ButtonStyle.Danger" Click=@CloseAsync />
+		</div>
+	</FooterContent>
+</DialogLayout>
+
+@code {
+
+
+
+
+	[Parameter]
+	public Guid Id { get; set; } = Guid.Empty;
+
+	private SeccionDePruebasAPID.SeccionDePruebasAPIC currentData { get; set; }
+
+
+	protected async override Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+
+		if (Id.IsNotEmpty())
+		{
+
+
+			/// GetRowsAsync
+			/// Conuslta todos los campos disponbiles del registro y datos relacionados básicos.
+			/// Esto tiene un impacto en el rendimiento considerable.
+			/// En entorno exigentes se puede optar por consultar informes utilizar PGSync
+			/// pero en la amplia mayoría de los casos no es necesario.
+			var getRowsParams = new Dinaup.RowsRequestParameters(Id);
+			var result = await DemoUp.MyDinaup.SectionsD.SeccionDePruebasAPID.GetRowsAsync(DinaupClient, getRowsParams, CurrentUserService.User);
+			if (result.IsNotEmpty())
+			{
+				currentData = result.FirstOrDefault();
+				this.editingTextoPrincipal = currentData.TextoPrincipal;
+				this.editingDecimal = currentData.CampoDecimal.Value;
+				this.editingDateTime = currentData.FechaYHoraConSegundos_UTC.ToLocalTime_PN();
+				this.editingTimeOnly = currentData.HoraSinSegundos;
+				this.editingDateOnly = currentData.FechaDePrueba;
+
+
+			}
+
+		}
+
+	}
+
+}
+
+
+
+@code {
+
+
+	string editingTextoPrincipal = "";
+	decimal editingDecimal = 0;
+	DateTime? editingDateTime = DateTime.Today;
+	TimeOnly? editingTimeOnly = new TimeOnly(12, 3, 3);
+	DateOnly? editingDateOnly = new DateOnly(2025, 3, 3);
+
+	bool HasChanged()
+	{
+		if (currentData.IsNull()) return true;
+		if (currentData.TextoPrincipal != editingTextoPrincipal) return true;
+		if (currentData.CampoDecimal.Value != editingDecimal) return true;
+		if (currentData.FechaYHoraConSegundos_UTC != editingDateTime) return true;
+		if (currentData.HoraSinSegundos != editingTimeOnly) return true;
+		if (currentData.FechaDePrueba != editingDateOnly) return true;
+		return false;
+	}
+
+
+
+}
+
+
+
+@code {
+
+
+
+
+	private bool acceptIsBussy = false;
+
+	private async Task AcceptAsync()
+	{
+		acceptIsBussy = true;
+
+		try
+		{
+			var wOp = new WriteOperation(Id);
+
+			wOp.DataMainRow.Add(SeccionDePruebasAPIES.TextoPrincipal, editingTextoPrincipal);
+			wOp.DataMainRow.Add(SeccionDePruebasAPIES.CampoDecimal, editingDecimal.ToSQL());
+
+			if (editingDateTime.HasValue)
+				wOp.DataMainRow.Add(SeccionDePruebasAPIES.FechaYHoraConSegundos_UTC, editingDateTime.Value.ToUniversalTime().ToSQL());
+			else
+				wOp.DataMainRow.Add(SeccionDePruebasAPIES.FechaYHoraConSegundos_UTC, "");
+
+			if (editingTimeOnly.HasValue)
+				wOp.DataMainRow.Add(SeccionDePruebasAPIES.HoraSinSegundos, editingTimeOnly.Value.ToSQL());
+			else
+				wOp.DataMainRow.Add(SeccionDePruebasAPIES.HoraSinSegundos, TimeOnly.MinValue.ToSQL());
+
+			if (editingDateOnly.HasValue)
+				wOp.DataMainRow.Add(SeccionDePruebasAPIES.FechaDePrueba, editingDateOnly.ToSQL());
+			else
+				wOp.DataMainRow.Add(SeccionDePruebasAPIES.FechaDePrueba, "");
+
+
+
+
+
+			var result = await DinaupClient.RunWriteOperationAsync(CurrentUserService.User, SeccionDePruebasAPID._SectionIDGUID, wOp, false);
+			result.EnsureSuccess();
+			Id = wOp.WriteOperationResult.RowID;
+			await CloseAsync();
+		}
+		catch (Exception ex)
+		{
+			NotificationService.Notify(NotificationSeverity.Error, "Ups.", ex.Message);
+		}
+
+		acceptIsBussy = false;
+
+
+	}
+
+
+	private async Task CloseAsync()
+	{
+		await Task.CompletedTask;
+		close();
+
+	}
+
+
+	private bool isClosed = false;
+	void close()
+	{
+		if (!isClosed)
+		{
+			isClosed = true;
+			// eso ace que se pueda capturar la ID desde la función que llama a este dialogo
+			DialogService.Close(this.Id);
+		}
+	}
+}

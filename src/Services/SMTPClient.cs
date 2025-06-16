@@ -44,6 +44,6 @@ public class SMTPClient
 		};
 		mailMessage.To.Add(to);
 
-		await smtpClient.SendMailAsync(mailMessage);
+	 await smtpClient.SendMailAsync(mailMessage);
 	}
 }

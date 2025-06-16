@@ -1,0 +1,63 @@
+﻿@page "/Ej4"
+@using Dinaup
+@using static DemoUp.MyDinaup.SectionsD.PaisesD
+
+
+
+
+
+<RadzenCard>
+	<CardTitleU Title="Paises [CodigoPais != ES]" Icon="globe_uk" >
+		<HelpContent>
+			Este informe se carga con filtros aplicados, en este caso excluye todos los paises cuyo código de pais sea ES.
+		</HelpContent>
+	</CardTitleU>
+
+	<div class="p-2 d-flex gap-2">
+		<RadzenTextBox Placeholder="🔍 Buscar..." @bind-Value=QuerySearch @bind-Value:after=@UpdateSearch />
+	</div>
+
+	<RadzenDataGrid Data=@ReportData?.Rows Count=@(ReportData?.TotalResults ?? 0) PageSize=@PageSize AllowSorting=true AllowPaging="true" AllowFiltering="true" IsLoading=@ReportData.IsNull() LoadData="@LoadData"> 
+		<Columns>
+			<RadzenDataGridColumn Property=@(nameof(APIPaisesC.APIPaises_RowC.TextoPrincipal)) Title="Nombre Pais" Width="200px" />
+			<RadzenDataGridColumn Property=@(nameof(APIPaisesC.APIPaises_RowC.CodAlfabetico2)) Title="Código Pais" Width="100px" />
+		</Columns>
+	</RadzenDataGrid>
+
+</RadzenCard>
+
+@code {
+
+ 
+
+	private string QuerySearch { get; set; }
+	private int PageSize = 10;
+	private DemoUp.MyDinaup.Reports.FuncionalidadD.APIPaisesC ReportData = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		ReportData.RequestParams.ResultsPerPage = PageSize;
+		ReportData.RequestParams.CurrentPage = 1;
+		await LoadData(null);
+	}
+
+
+	private async Task LoadData(LoadDataArgs args)
+	{
+		var options = new ReportRequestOptions
+		{
+			AdvancedFilters = [ new FilterCondition(PaisesES.CodigoDePaisAlfabeticoDe2Caracteres, "!=", "es")]
+		};
+		await Extensions.LoadReportDataAsync(DinaupClient, CurrentUserService.User, ReportData, args ,options);
+	}
+
+	private async Task UpdateSearch()
+	{
+		ReportData.RequestParams.QuerySearch = QuerySearch;
+		ReportData.RequestParams.CurrentPage = 1;
+		await ReportData.ExecuteUpdateDataAsync();
+
+	}
+
+}

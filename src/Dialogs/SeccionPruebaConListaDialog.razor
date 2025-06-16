@@ -1,0 +1,223 @@
+﻿@using Dinaup
+@using ReadyToBlazor.Data
+@using static DemoUp.MyDinaup.SectionsD.SeccionDePruebasAPID
+@using static DemoUp.MyDinaup.SectionsD
+<RadzenTemplateForm @ref=@form Data=@editForm TItem="SeccionDePruebaModel" Submit=@AcceptAsync class="h-100">
+
+	<DialogLayout>
+
+
+		<BodyContent>
+
+			<div class="d-flex flex-column gap-3">
+
+
+
+
+				<RadzenCard>
+					<CardTitleU Title="Listador" />
+
+					<RadzenCard Variant="Variant.Outlined" class="m-2">
+						<RadzenFormField Text="Título">
+							<Start>
+								<RadzenIcon Icon="title" />
+							</Start>
+							<ChildContent>
+								<RadzenTextBox Name="titulo" @bind-Value=@editForm.Titulo />
+							</ChildContent>
+							<Helper>
+								<RadzenDataAnnotationValidator Component="titulo" />
+							</Helper>
+						</RadzenFormField>
+
+						<RadzenFormField Text="Valor decimal">
+							<Start>
+								<RadzenIcon Icon="calculate" />
+							</Start>
+							<ChildContent>
+								<RadzenNumeric Name="campoDecimal" @bind-Value=@editForm.CampoDecimal />
+							</ChildContent>
+							<Helper>
+								<RadzenDataAnnotationValidator Component="campoDecimal" />
+							</Helper>
+						</RadzenFormField>
+
+						<RadzenFormField Text="Hora">
+							<Start>
+								<RadzenIcon Icon="schedule" />
+							</Start>
+							<ChildContent>
+								<RadzenDatePicker Name="hora" @bind-Value=@editForm.HoraSinSegundos TimeOnly="true" />
+							</ChildContent>
+							<Helper>
+								<RadzenDataAnnotationValidator Component="hora" />
+							</Helper>
+						</RadzenFormField>
+
+						<RadzenFormField Text="Fecha">
+							<Start>
+								<RadzenIcon Icon="event" />
+							</Start>
+							<ChildContent>
+								<RadzenDatePicker Name="fecha" @bind-Value=@editForm.FechaDePrueba />
+							</ChildContent>
+							<Helper>
+								<RadzenDataAnnotationValidator Component="fecha" />
+							</Helper>
+						</RadzenFormField>
+
+						<RadzenFormField Text="Fecha y Hora">
+							<Start>
+								<RadzenIcon Icon="calendar_today" />
+							</Start>
+							<ChildContent>
+								<RadzenDatePicker Name="fechayhora" @bind-Value=@editForm.FechaYHoraConSegundos ShowTime="true" />
+							</ChildContent>
+							<Helper>
+								<RadzenDataAnnotationValidator Component="fechayhora" />
+							</Helper>
+						</RadzenFormField>
+					</RadzenCard>
+
+
+				</RadzenCard>
+
+
+
+				<RadzenCard>
+					<CardTitleU Title="Lista" />
+
+
+					@foreach (var item in editForm.Items.Where((e) => e.Eliminado == false))
+					{
+						var itemX = item;
+
+						<div class="d-flex justify-content-between align-items-center align-content-center">
+							<div class="flex-grow-1">
+								<ReadyToBlazor.Dialogs.SeccionPruebaConLista.ItemForm Data=@item />
+							</div>
+							<RadzenButton Icon="close" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Click=@(() => editForm.RemoveItem(itemX))></RadzenButton>
+						</div>
+					}
+
+					<div class="d-flex justify-content-start">
+						<RadzenButton Icon="add" Text="Añadir nuevo elemento a la Lista" Variant=Variant.Text ButtonStyle="ButtonStyle.Success" Click=@((e) => editForm.AddItem()) />
+					</div>
+				</RadzenCard>
+
+
+
+			</div>
+
+
+		</BodyContent>
+		<FooterContent>
+			<div class="d-flex gap-2 justify-content-end">
+				<RadzenButton Icon="check" Text="Guardar" Variant=Variant.Text ButtonStyle="ButtonStyle.Success" ButtonType="ButtonType.Submit" IsBusy=@acceptIsBussy />
+				<RadzenButton Icon="close" Text="Cerrar" Variant="Variant.Text" ButtonStyle="ButtonStyle.Danger" Click=@CloseAsync />
+			</div>
+		</FooterContent>
+	</DialogLayout>
+</RadzenTemplateForm>
+
+@code {
+
+
+
+	RadzenTemplateForm<SeccionDePruebaModel> form;
+
+	[Parameter]
+	public Guid Id { get; set; } = Guid.Empty;
+
+
+	private SeccionDePruebaModel editForm = new();
+
+	private SeccionDePruebasAPID.SeccionDePruebasAPI_WithListC currentData { get; set; }
+
+
+	protected async override Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+
+		if (Id.IsNotEmpty())
+		{
+
+
+			/// GetRowsAsync
+			/// Conuslta todos los campos disponbiles del registro y datos relacionados básicos.
+			/// Esto tiene un impacto en el rendimiento considerable.
+			/// En entorno exigentes se puede optar por consultar informes utilizar PGSync
+			/// pero en la amplia mayoría de los casos no es necesario.
+			var getRowsParams = new Dinaup.RowsRequestParameters(Id);
+			var result = await DemoUp.MyDinaup.SectionsD.SeccionDePruebasAPID.GetRowsWithListAsync(DinaupClient, getRowsParams, CurrentUserService.User);
+			if (result.IsNotEmpty())
+			{
+				currentData = result.FirstOrDefault();
+				this.editForm = new(currentData);
+
+			}
+
+		}
+
+	}
+
+}
+
+
+
+
+
+
+
+@code {
+
+
+
+
+	private bool acceptIsBussy = false;
+
+	private async Task AcceptAsync()
+	{
+		acceptIsBussy = true;
+
+		try
+		{
+			var wOp = editForm.ToWriteOperation();
+			var result = await DinaupClient.RunWriteOperationAsync(CurrentUserService.User, SeccionDePruebasAPID._SectionIDGUID, wOp, false);
+			result.EnsureSuccess();
+			Id = wOp.WriteOperationResult.RowID;
+			await CloseAsync();
+		}
+		catch (Exception ex)
+		{
+			NotificationService.Notify(NotificationSeverity.Error, "Ups.", ex.Message);
+		}
+
+		acceptIsBussy = false;
+
+
+	}
+
+
+
+
+	private async Task CloseAsync()
+	{
+		await Task.CompletedTask;
+		close();
+
+	}
+
+
+	private bool isClosed = false;
+	void close()
+	{
+		if (!isClosed)
+		{
+			isClosed = true;
+			// eso ace que se pueda capturar la ID desde la función que llama a este dialogo
+			DialogService.Close(editForm?.ID ?? Guid.Empty);
+		}
+	}
+}

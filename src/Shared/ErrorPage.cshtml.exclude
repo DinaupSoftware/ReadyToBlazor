@@ -1,6 +1,7 @@
 ﻿@page
-@model ReadyToBlazor.Pages.ErrorModel
-
+@using ReadyToBlazor.Pages
+@using ReadyToBlazor.Shared
+@model ReadyToBlazor.Shared.ErrorModel
 <!DOCTYPE html>
 <html lang="en">
 

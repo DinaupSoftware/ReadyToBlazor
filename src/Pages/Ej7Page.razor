@@ -1,0 +1,100 @@
+﻿@page "/Ej7"
+@using Dinaup
+@using ReadyToBlazor.Dialogs
+@using static DemoUp.MyDinaup.SectionsD
+@using static DemoUp.MyDinaup.SectionsD.SeccionDePruebasAPID
+@using static DemoUp.MyDinaup.Reports.FuncionalidadD.APISeccionDePruebasAPIC
+
+<RadzenCard>
+	<CardTitleU Title="Agregar Con Lista" Icon="add" />
+
+
+	<RadzenButton Icon="add" Text="Abrir Dialogo" Click=@AddTestData></RadzenButton>
+</RadzenCard>
+<div style="min-height:10px"></div>
+<RadzenCard>
+	<CardTitleU Title="Pruebas" Icon="labs" />
+
+	<div class="p-2 d-flex gap-2">
+		<RadzenTextBox Placeholder="🔍 Buscar..." @bind-Value=QuerySearch @bind-Value:after=@UpdateSearch />
+	</div>
+
+	<RadzenDataGrid TItem="APISeccionDePruebasAPI_RowC" RowDoubleClick=@OnRowDoubleClick Data=@ReportData?.Rows Count=@(ReportData?.TotalResults ?? 0) PageSize=@PageSize AllowSorting=true AllowPaging="true" AllowFiltering="true" IsLoading=@ReportData.IsNull() LoadData="@LoadData">
+		<Columns>
+			<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.TextoPrincipal))" Title="Nombre" Width="200px" />
+			<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.FechaIA))" Title="Fecha" Width="100px" />
+			<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.Valorentero))" Title="Valorentero" Width="100px" />
+			<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.Textodeprueba))" Title="Textodeprueba" Width="100px" />
+		</Columns>
+	</RadzenDataGrid>
+</RadzenCard>
+
+@code {
+	private string QuerySearch { get; set; }
+	private int PageSize = 10;
+	private DemoUp.MyDinaup.Reports.FuncionalidadD.APISeccionDePruebasAPIC ReportData = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		ReportData.RequestParams.ResultsPerPage = PageSize;
+		ReportData.RequestParams.CurrentPage = 1;
+		await LoadData(null);
+	}
+
+	private async Task LoadData(LoadDataArgs args)
+	{
+		await Extensions.LoadReportDataAsync(DinaupClient, CurrentUserService.User, ReportData, args);
+	}
+
+	private async Task UpdateSearch()
+	{
+		ReportData.RequestParams.QuerySearch = QuerySearch;
+		ReportData.RequestParams.CurrentPage = 1;
+		await ReportData.ExecuteUpdateDataAsync();
+	}
+
+	private async Task Refresh()
+	{
+		await ReportData.ExecuteUpdateDataAsync();
+	}
+
+}
+
+@code {
+
+	string editingText;
+
+	private bool addTestDataIsBusy { get; set; }
+
+	private async Task AddTestData()
+	{
+
+
+		dynamic resul = await DialogService.OpenAsync<SeccionPruebaConListaDialog>("Agregar Prueba",
+			   new Dictionary<string, object> { { nameof(SeccionPruebaConListaDialog.Id), Guid.Empty } },
+			   new DialogOptions { Width = "800px", Height = "900px", Resizable = true, Draggable = true });
+
+		if (resul is Guid guidResult)
+		{
+			// El resultado es un GUID. Puedes utilizar guidResult de forma segura.
+			Console.WriteLine($"El GUID creado es: {guidResult}");
+		}
+		else
+		{
+			// El resultado no es un GUID.
+			Console.WriteLine("El resultado no es un GUID.");
+		}
+
+	}
+
+	
+	private async Task  OnRowDoubleClick(DataGridRowMouseEventArgs<APISeccionDePruebasAPI_RowC> args)
+	{
+		dynamic resul = await DialogService.OpenAsync<SeccionPruebaConListaDialog>("Agregar Prueba",
+		   new Dictionary<string, object> { { nameof(SeccionPruebaConListaDialog.Id), args.Data.ID  } },
+		   new DialogOptions { Width = "800px", Height = "900px", Resizable = true, Draggable = true });
+	}
+
+
+}

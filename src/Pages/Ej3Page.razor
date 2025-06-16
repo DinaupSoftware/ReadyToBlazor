@@ -1,0 +1,56 @@
+﻿@page "/Ej3"
+@using Dinaup
+
+<RadzenCard>
+	<CardTitleU Title="Paises" Icon="globe_uk" />
+
+	<div class="p-2 d-flex gap-2">
+		<RadzenTextBox Placeholder="🔍 Buscar..." @bind-Value=QuerySearch @bind-Value:after=@UpdateSearch />
+	</div>
+
+	<RadzenDataGrid Data=@ReportData?.Rows
+					Count=@(ReportData?.TotalResults ?? 0)
+					PageSize=@PageSize
+					AllowSorting=true
+					AllowPaging="true"
+					AllowFiltering="true"
+					IsLoading=@ReportData.IsNull()
+					LoadData="@LoadData">
+		<Columns>
+			<RadzenDataGridColumn Property=@(nameof(APIPaisesC.APIPaises_RowC.TextoPrincipal)) Title="Nombre Pais" Width="200px" />
+			<RadzenDataGridColumn Property=@(nameof(APIPaisesC.APIPaises_RowC.CodAlfabetico2)) Title="Código Pais" Width="100px" />
+		</Columns>
+	</RadzenDataGrid>
+
+</RadzenCard>
+
+@code {
+
+
+	private string QuerySearch { get; set; }
+	private int PageSize = 10;
+	private DemoUp.MyDinaup.Reports.FuncionalidadD.APIPaisesC ReportData = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		ReportData.RequestParams.ResultsPerPage = PageSize;
+		ReportData.RequestParams.CurrentPage = 1;
+		await LoadData(null);
+	}
+
+
+	private async Task LoadData(LoadDataArgs args)
+	{
+		await Extensions.LoadReportDataAsync(DinaupClient, CurrentUserService.User, ReportData, args);
+	}
+
+	private async Task UpdateSearch( )
+	{
+		ReportData.RequestParams.QuerySearch = QuerySearch;
+		ReportData.RequestParams.CurrentPage = 1;
+		await ReportData.ExecuteUpdateDataAsync();
+
+	}
+
+}

@@ -1,0 +1,76 @@
+﻿@inherits LayoutComponentBase
+
+
+@if (DinaupClient.IsConnected == false)
+{
+
+	<div>
+		Estamos realizando tareas de mantenimiento, pronto volvera a estar disponible.
+	</div>
+
+}
+else
+{
+
+<LoginView>
+	<Authorized>
+		<PageTitle>ReadyToBlazor</PageTitle>
+		<RadzenLayout>
+			<RadzenHeader>
+				<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+					<RadzenSidebarToggle Click="@(() => sidebar1Expanded = !sidebar1Expanded)" />
+					<RadzenLabel Text="Ready To Blazor" />
+				</RadzenStack>
+			</RadzenHeader>
+			<RadzenSidebar @bind-Expanded="@sidebar1Expanded">
+				<RadzenPanelMenu>
+					<RadzenPanelMenuItem Text="Inicio" Icon="home" />
+					<RadzenPanelMenuItem Text="Ejemplo 1" Icon="science" Path="/Ej1" />
+					<RadzenPanelMenuItem Text="Ejemplo 2" Icon="science" Path="/Ej2" />
+					<RadzenPanelMenuItem Text="Ejemplo 3" Icon="science" Path="/Ej3" />
+					<RadzenPanelMenuItem Text="Ejemplo 4" Icon="science" Path="/Ej4" />
+					<RadzenPanelMenuItem Text="Ejemplo 5" Icon="science" Path="/Ej5" />
+					<RadzenPanelMenuItem Text="Ejemplo 6" Icon="science" Path="/Ej6" />
+					<RadzenPanelMenuItem Text="Ejemplo 7" Icon="science" Path="/Ej7" />
+				</RadzenPanelMenu>
+				<div class="rz-p-4">
+					Sidebar
+				</div>
+			</RadzenSidebar>
+			<RadzenBody>
+				<div class="rz-p-4">
+					@Body
+				</div>
+			</RadzenBody>
+			<RadzenFooter>
+			 Footer
+			</RadzenFooter>
+		</RadzenLayout>
+
+		@code {
+			bool sidebar1Expanded = true;
+		}
+
+	</Authorized>
+	<NotAuthorized>
+		<PageTitle>ReadyToBlazor</PageTitle>
+		<RadzenLayout>
+			<RadzenHeader>
+				<div class="h-100 d-flex align-items-center align-content-center" style="padding-left:20px">
+					<b>ReadyToBlazor</b>.   Aplicación de Ejemplo.
+				</div>
+			</RadzenHeader>
+			<RadzenBody class="d-flex justify-content-center align-content-cente align-items-center">
+				<ReadyToBlazor.Pages.Sesion.LoginForm />
+			</RadzenBody>
+			<RadzenFooter>
+				Hola mundo.
+			</RadzenFooter>
+		</RadzenLayout>
+	</NotAuthorized>
+</LoginView>
+
+<RadzenComponents />
+}
+
+

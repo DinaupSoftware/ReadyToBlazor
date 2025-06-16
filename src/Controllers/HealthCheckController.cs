@@ -8,26 +8,26 @@ public partial class HealthCheckController : Controller
 {
 
 
-		private readonly IMemoryCache cache;
-		private readonly DinaupClientC  DinaupClient;
+	private readonly IMemoryCache cache;
+	private readonly DinaupClientC DinaupClient;
 
-	public HealthCheckController( IMemoryCache _cache,DinaupClientC  DinaupClient )
+	public HealthCheckController(IMemoryCache _cache, DinaupClientC DinaupClient)
 	{
 		this.cache = _cache;
 		this.DinaupClient = DinaupClient;
 	}
 
 
-	
+
 	[HttpGet("HealthCheck")]
 	public async Task<IResult> getHealthCheck()
 	{
 		const string cacheKey = "HealthCheckCacheKey";
 
-		if (cache.TryGetValue(cacheKey, out Dictionary<string, bool> components) == false )
+		if (cache.TryGetValue(cacheKey, out Dictionary<string, bool> components) == false)
 		{
 			components = new Dictionary<string, bool>();
-			components.Add("DinaupClient", this.DinaupClient.IsConnected );
+			components.Add("DinaupClient", this.DinaupClient.IsConnected);
 			cache.Set(cacheKey, components, TimeSpan.FromSeconds(10));
 		}
 

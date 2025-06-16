@@ -1,4 +1,6 @@
-﻿ 
+﻿
+
+using Microsoft.AspNetCore.Http;
 
 public class ErrorFatalMiddleware
 {

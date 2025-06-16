@@ -406,3 +406,7 @@ FodyWeavers.xsd
  
 /src/appsettings.json
 /src/appsettings.Development.json
+
+
+Contexto.py
+ready_to_blazor_all.txt

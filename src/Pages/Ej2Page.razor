@@ -1,0 +1,43 @@
+﻿@page "/Ej2"
+@using Dinaup
+@using static DemoUp.MyDinaup.Reports.FuncionalidadD.APISeccionDePruebasAPIC
+
+
+<RadzenDataGrid Data=@ReportData?.Rows
+				Count=@(ReportData?.TotalResults ?? 0)
+				PageSize=@PageSize
+				AllowSorting=true
+				AllowPaging="true"
+				AllowFiltering="true"
+				IsLoading=@ReportData.IsNull()
+				LoadData="@LoadData">
+	<Columns>
+		<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.TextoPrincipal))" Title="Nombre País" Width="200px" />
+		<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.FechaIA))" Title="Fecha" Width="100px" />
+		<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.Valorentero))" Title="Valorentero" Width="100px" />
+		<RadzenDataGridColumn Property="@(nameof(APISeccionDePruebasAPI_RowC.Textodeprueba))" Title="Textodeprueba" Width="100px" />
+	</Columns>
+</RadzenDataGrid>
+
+
+@code {
+
+	private int PageSize = 10;
+	private DemoUp.MyDinaup.Reports.FuncionalidadD.APISeccionDePruebasAPIC ReportData = new();
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		ReportData.RequestParams.ResultsPerPage = PageSize;
+		ReportData.RequestParams.CurrentPage = 1;
+		await LoadData(null);
+	}
+
+
+	private async Task LoadData(LoadDataArgs args)
+	{
+		await Extensions.LoadReportDataAsync(DinaupClient, CurrentUserService.User, ReportData, args);
+	}
+
+}
